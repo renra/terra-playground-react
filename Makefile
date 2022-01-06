@@ -1,6 +1,11 @@
 DIST=src/dist
-INPUT_APP_NAME=CNBExchangeRates
+INPUT_APP_NAME=TerraPlayground
 OUTPUT_APP_NAME=app
+
+JS_POLY_INPUT=src/js/Polyfills.ts
+JS_POLY_OUTPUT=${DIST}/polyfills.js
+JS_POLY_MIN_OUTPUT=${DIST}/polyfills.min.js
+JS_POLY_MIN_GZIPPED_OUTPUT=${JS_POLY_MIN_OUTPUT}.gz
 
 JS_INPUT=src/js/${INPUT_APP_NAME}.tsx
 JS_OUTPUT=${DIST}/${OUTPUT_APP_NAME}.js
@@ -30,7 +35,10 @@ clean_css:
 
 dev: clean js_for_development css_for_development
 
-js_for_development: clean_js typecheck_js compile_to_js_for_development
+js_for_development: clean_js typecheck_js compile_polyfills_for_development compile_to_js_for_development
+
+compile_polyfills_for_development:
+	esbuild ${JS_POLY_INPUT} --bundle --outfile=${JS_POLY_OUTPUT}
 
 compile_to_js_for_development:
 	esbuild ${JS_INPUT} --bundle --outfile=${JS_OUTPUT}
@@ -43,10 +51,13 @@ compile_to_css_for_development:
 
 # Production #
 
-build: clean typecheck_js compile_to_js compile_to_css_for_development gzip_js compile_to_css gzip_css
+build: clean typecheck_js compile_polyfills compile_to_js compile_to_css_for_development gzip_js compile_to_css gzip_css
 
 typecheck_js:
 	tsc
+
+compile_polyfills:
+	esbuild ${JS_POLY_INPUT} --bundle --minify --outfile=${JS_POLY_MIN_OUTPUT}
 
 compile_to_js:
 	esbuild ${JS_INPUT} --bundle --minify --outfile=${JS_MIN_OUTPUT}
