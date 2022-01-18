@@ -1,4 +1,4 @@
-DIST=src/dist
+DIST=dist
 INPUT_APP_NAME=TerraPlayground
 OUTPUT_APP_NAME=app
 
@@ -17,6 +17,9 @@ CSS_OUTPUT=${DIST}/${OUTPUT_APP_NAME}.css
 CSS_MIN_OUTPUT=${DIST}/${OUTPUT_APP_NAME}.min.css
 CSS_MIN_GZIPPED_OUTPUT=${CSS_MIN_OUTPUT}.gz
 
+IMAGES_INPUT=src/imgs
+IMAGES_OUTPUT=${DIST}/imgs
+
 .DEFAULT_GOAL := dev
 .PHONY: clean
 .PHONY: clean_js
@@ -26,6 +29,7 @@ clean: clean_js clean_css
 
 clean_js:
 	rm -rf ${JS_OUTPUT} ${JS_MIN_OUTPUT} ${JS_MIN_GZIPPED_OUTPUT}
+	rm -rf ${JS_POLY_OUTPUT} ${JS_POLY_MIN_OUTPUT} ${JS_POLY_MIN_GZIPPED_OUTPUT}
 
 clean_css:
 	rm -rf ${CSS_OUTPUT} ${CSS_MIN_OUTPUT} ${CSS_MIN_GZIPPED_OUTPUT}
@@ -33,7 +37,7 @@ clean_css:
 
 # Development #
 
-dev: clean js_for_development css_for_development
+dev: js_for_development css_for_development copy_images
 
 js_for_development: clean_js typecheck_js compile_polyfills_for_development compile_to_js_for_development
 
@@ -48,10 +52,13 @@ css_for_development: clean_css compile_to_css_for_development
 compile_to_css_for_development:
 	sass --no-source-map ${CSS_INPUT}:${CSS_OUTPUT}
 
+copy_images:
+	cp -R ${IMAGES_INPUT}/* ${IMAGES_OUTPUT}/
+
 
 # Production #
 
-build: clean typecheck_js compile_polyfills compile_to_js compile_to_css_for_development gzip_js compile_to_css gzip_css
+build: clean typecheck_js compile_polyfills compile_to_js compile_to_css_for_development gzip_js compile_to_css gzip_css copy_images
 
 typecheck_js:
 	tsc

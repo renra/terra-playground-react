@@ -36,7 +36,7 @@ const
 
 const readFile = function(path) {
   return new Promise(function(resolve, reject) {
-    fs.readFile(path, 'utf8', function(err, contents) {
+    fs.readFile(path, function(err, contents) {
       if(err) {
         reject(err);
       } else {
@@ -52,12 +52,12 @@ const getIndexBody = function(variables) {
     <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="/src/dist/app.css" />
+        <link rel="stylesheet" type="text/css" href="app.css" />
       </head>
 
       <body>
-        <script src="/src/dist/polyfills.js"></script>
-        <script src="/src/dist/app.js"></script>
+        <script src="polyfills.js"></script>
+        <script src="app.js"></script>
 
         <div id="outlet"></div>
 
@@ -76,7 +76,27 @@ const getIndexBody = function(variables) {
   return template;
 };
 
+const contentType = (path) => {
+  if(path.endsWith('.jpg')) {
+    return 'image/jpeg';
+  } else if(path.endsWith('.css')) {
+    return 'text/css';
+  } else if(path.endsWith('.js')) {
+    return 'application/javascript';
+  } else {
+    return 'text/html';
+  }
+}
+
+const successResponseHeaders = (path, contents) => {
+  return {
+    'Content-Type': contentType(path),
+    'Content-Length': contents.length,
+  }
+}
+
 http.createServer(async function (req, res) {
+  // TODO: Handle request cancellation
   if(req.url.startsWith('/favicon.ico')) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end();
@@ -88,18 +108,21 @@ http.createServer(async function (req, res) {
     res.write(getIndexBody({}));
     res.end();
   } else {
-    let filepath = `.${req.url}`;
+    let filepath = `./dist${req.url.replace('../', './')}`;  // Replacing just to be sure
 
+    // TODO: Use pipes here
     await readFile(filepath)
       .then(function(contents) {
+        res.writeHead(200, successResponseHeaders(filepath, contents));
         res.write(contents);
         res.end();
+
+        fs.writeFileSync(`${filepath}2`, contents);
       })
       .catch(function(err) {
         console.log(err);
 
         res.writeHead(404);
-        res.write(err.toString());
         res.end();
       })
   }
