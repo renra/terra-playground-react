@@ -12,6 +12,7 @@ services:
       - ./Makefile:/usr/src/app/Makefile
       - ./server.js:/usr/src/app/server.js
       - ./src:/usr/src/app/src
+      - ./dist:/usr/src/app/dist
       - ./tsconfig.json:/usr/src/app/tsconfig.json
 
   watcher:
@@ -21,4 +22,5 @@ services:
       - ./Makefile:/usr/src/app/Makefile
       - ./watcher.js:/usr/src/app/watcher.js
       - ./src:/usr/src/app/src
+      - ./dist:/usr/src/app/dist
       - ./tsconfig.json:/usr/src/app/tsconfig.json

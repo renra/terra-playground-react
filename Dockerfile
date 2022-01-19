@@ -23,6 +23,8 @@ COPY Makefile Makefile
 COPY server.js server.js
 COPY watcher.js watcher.js
 
+COPY dist dist
+
 ## Any change in the src folder invalidates the cache of this step
 ##  but the dependencies are still cached
 COPY src src
