@@ -77,9 +77,12 @@ const getIndexBody = function(variables) {
 };
 
 const contentType = (path) => {
-  // TODO: Support pngs and svgs
-  if(path.endsWith('.jpg')) {
+  if(path.endsWith('.jpg') || path.endsWith(".jpeg")) {
     return 'image/jpeg';
+  } else if(path.endsWith('.png')) {
+    return 'image/png';
+  } else if(path.endsWith('.svg')) {
+    return 'image/svg+xml';
   } else if(path.endsWith('.css')) {
     return 'text/css';
   } else if(path.endsWith('.js')) {
